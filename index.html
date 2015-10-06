@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="dashboardApp">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>APISpark dashboard</title>
+  <meta name="viewport" content="width=device-width">
+
+  <link rel="stylesheet" href="./fonts/track.css">
+  <link rel="stylesheet" href="./styles/reset.css">
+  <link rel="stylesheet" href="./styles/app.css">
+</head>
+<body ng-cloak>
+
+<div ng-controller="dashboardCtrl as ctrl">
+
+  <div class="branch" ng-repeat="env in ctrl.envs">
+    <h2 class="branch-title">{{ env.name }}</h2>
+
+    <div class="card build-car build-card-ok"
+         ng-class="{ OK: 'build-card-ok', KO: 'build-card-broken' }[env.status]">
+      <div class="card-content">
+        <h3 class="card-title">version</h3>
+
+        <div ng-if="env.status === 'OK'">
+          <div class="card-value">{{ env.version }}</div>
+          <p class="card-note">
+            <strong>GIT</strong>
+            {{ env.sha1 }}
+          </p>
+        </div>
+
+        <div ng-if="env.status === 'KO'">
+          <div class="card-value">{{ env.errorCode }}</div>
+          <p class="card-note">
+            <strong>Cause</strong>
+            {{ env.errorText }}
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>
+<script src="./scripts/app.js"></script>
+
+</body>
+</html>
