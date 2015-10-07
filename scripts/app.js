@@ -67,6 +67,6 @@ angular.module('dashboardApp', [])
 
     $interval(function () {
       updateEnvs(ctrl.envs);
-    }, 60 * 1000);
+    }, 10 * 1000);
 
   });
