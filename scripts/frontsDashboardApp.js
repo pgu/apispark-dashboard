@@ -56,22 +56,21 @@ angular.module('frontsDashboardApp', [])
     function updateVersions (apps) {
 
       _.each(apps, function (appConfig, appName) {
-
-        var envName = 'staging';
-        var envConfig = appConfig.env.staging;
-
-        fetchVersionForEnv(envName, envConfig);
+        _.each(appConfig.env, function (envConfig, envName) {
+          fetchVersionForEnv(envName, envConfig, appConfig);
+        });
       });
 
     }
 
-    function fetchVersionForEnv (envName, envConfig) {
+    function fetchVersionForEnv (envName, envConfig, appConfig) {
 
-      var url = envConfig
+      var url = envConfig.url
         .replace('{user}', ctrl.credentials[ envName ].user)
         .replace('{pwd}', ctrl.credentials[ envName ].pwd);
 
-      var fileUrl = url + envConfig.file;
+      var fileUrl = url + appConfig.file;
+      console.log(fileUrl);
 
       envConfig.status = '';
 
