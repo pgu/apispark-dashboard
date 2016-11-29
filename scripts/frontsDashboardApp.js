@@ -4,69 +4,112 @@ angular.module('frontsDashboardApp', [])
 
     var ctrl = this;
 
-    ctrl.envs = [
-      {
-        name: 'Staging',
-        url: 'https://apispark.rest-let.com/'
+    ctrl.shouldShowCredentialsForm = true;
+
+    ctrl.apps = {
+      studio: {
+        file: 'studio.json',
+        env: {
+          staging: {
+            url: 'https://{user}:{pwd}@studio.rest-let.com/'
+          },
+          prod: {
+            url: 'https://studio.restlet.com/'
+          }
+        }
+      },
+      hub: {
+        file: 'hub.json',
+        env: {
+          staging: {
+            url: 'https://{user}:{pwd}@preview.staging.rest-let.io/'
+          },
+          prod: {
+            url: 'https://preview.restlet.io/'
+          }
+        }
       }
-      , {
-        name: 'Preprod',
-        url: 'https://apispark.preprod.rest-let.com/'
-      }
-      , {
-        name: 'Prod',
-        url: 'https://apispark.restlet.com/'
-      }
-    ];
+    };
 
-    function updateEnvs (envs) {
+    ctrl.credentials = {
+      staging: { user: '', pwd: '' },
+      prod: { user: '', pwd: '' }
+    };
 
-      _.each(envs, function (env) {
+    ctrl.saveCredentials = saveCredentials;
 
-        env.status = '';
+    function saveCredentials () {
+      ctrl.shouldShowCredentialsForm = false;
 
-        env.version = '';
-        env.sha1 = '';
+      launchMonitoring();
+    }
 
-        env.errorCode = '';
-        env.errorText = '';
 
-        $http.get(env.url + 'version')
-          .then(function (response) {
+    function launchMonitoring () {
+      updateVersions(ctrl.apps);
 
-            var data = response.data;
+      $interval(function () {
+        updateVersions(ctrl.apps);
+      }, 10 * 1000);
+    }
 
-            var isHtmlPage = data.indexOf('<head>') > -1; // can return 200 with html content
-            if (isHtmlPage) {
-              env.status = 'KO';
-              env.errorCode = '404';
-              env.errorText = 'Not found';
-              return;
-            }
+    function updateVersions (apps) {
 
-            env.status = 'OK';
+      _.each(apps, function (appConfig, appName) {
 
-            var parts = _.take(data.split('-'), 2);
+        var envName = 'staging';
+        var envConfig = appConfig.env.staging;
 
-            env.version = _.first(parts);
-            env.sha1 = _.last(parts);
-
-          })
-          .catch(function (response) {
-            env.status = 'KO';
-
-            env.errorCode = response.status;
-            env.errorText = response.statusText || 'none';
-          });
-
+        fetchVersionForEnv(envName, envConfig);
       });
 
     }
 
-    updateEnvs(ctrl.envs);
+    function fetchVersionForEnv (envName, envConfig) {
 
-    $interval(function () {
-      updateEnvs(ctrl.envs);
-    }, 10 * 1000);
+      var url = envConfig
+        .replace('{user}', ctrl.credentials[ envName ].user)
+        .replace('{pwd}', ctrl.credentials[ envName ].pwd);
+
+      var fileUrl = url + envConfig.file;
+
+      envConfig.status = '';
+
+      // envConfig.version = '';
+      // envConfig.sha1 = '';
+
+      envConfig.errorCode = '';
+      envConfig.errorText = '';
+
+      $http.get(fileUrl)
+        .then(function (response) {
+
+          var data = response.data;
+
+          var isHtmlPage = data.indexOf('<head>') > -1; // can return 200 with html content
+          if (isHtmlPage) {
+            envConfig.status = 'KO';
+            envConfig.errorCode = '404';
+            envConfig.errorText = 'Not found';
+            return;
+          }
+
+          envConfig.status = 'OK';
+
+          console.log(envConfig, data);
+          // var parts = _.take(data.split('-'), 2);
+
+          // env.version = _.first(parts);
+          // env.sha1 = _.last(parts);
+
+        })
+        .catch(function (response) {
+          envConfig.status = 'KO';
+
+          envConfig.errorCode = response.status;
+          envConfig.errorText = response.statusText || 'none';
+        });
+
+    }
 
   });

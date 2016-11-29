@@ -14,26 +14,26 @@
 
 <div ng-controller="frontsDashboardCtrl as ctrl">
 
-  <form name="credentialsForm" novalidate autocomplete="off" class="credentialsForm">
+  <form name="credentialsForm"
+        novalidate
+        autocomplete="off"
+        class="credentialsForm"
+        ng-show="ctrl.shouldShowCredentialsForm">
 
     <h1>Staging</h1>
     <div class="row-form">
-      <label for="staging-user">user</label><input id="staging-user" name="stagingUser"/>
+      <label for="staging-user">user</label>
+      <input id="staging-user" name="stagingUser"
+             ng-model="ctrl.credentials.staging.user"/>
     </div>
     <div class="row-form">
-      <label for="staging-pwd">pwd</label><input id="staging-pwd" name="stagingPwd"/>
-    </div>
-
-    <h1>Preprod</h1>
-    <div class="row-form">
-      <label for="preprod-user">user</label><input id="preprod-user" name="preprodUser"/>
-    </div>
-    <div class="row-form">
-      <label for="preprod-pwd">pwd</label><input id="preprod-pwd" name="preprodPwd"/>
+      <label for="staging-pwd">pwd</label>
+      <input id="staging-pwd" name="stagingPwd" type="password"
+             ng-model="ctrl.credentials.staging.pwd"/>
     </div>
 
     <p>
-      <button ng-click="saveCredentials()">Save</button>
+      <button ng-click="ctrl.saveCredentials()">Save</button>
     </p>
   </form>
 
@@ -68,7 +68,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.9/angular.min.js"></script>
 <script src="./scripts/frontsDashboardApp.js"></script>
 
 </body>
